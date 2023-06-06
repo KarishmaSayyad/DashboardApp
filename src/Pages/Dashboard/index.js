@@ -1,8 +1,10 @@
-import { Card, Space, Statistic, Typography } from "antd";
+import { Card, Space, Statistic, Table, Typography } from "antd";
 import { ShoppingCartOutlined, UserOutlined, DollarCircleOutlined, ShoppingOutlined } from '@ant-design/icons'
+import { useEffect, useState } from "react";
+import { getOrders } from "../../API";
 const Dashboard = () => {
     return (
-        <div>
+        <Space size={12} direction="vertical">
             <Typography.Title level={4} >Dashboard</Typography.Title>
             <Space direction="horizontal">
                 <DashBoardCard icon={<ShoppingCartOutlined
@@ -21,7 +23,7 @@ const Dashboard = () => {
                 <DashBoardCard icon={<ShoppingOutlined
                     style={
                         {
-                            color: "purple",
+                            color: "blue",
                             backgroundColor: "rgb(0,255,255,0.25)",
                             borderRadius: 20,
                             fontSize: 24,
@@ -35,7 +37,7 @@ const Dashboard = () => {
                     icon={<UserOutlined
                         style={
                             {
-                                color: "blue",
+                                color: "purple",
                                 backgroundColor: "rgba(0,0,255,0.5)",
                                 borderRadius: 20,
                                 fontSize: 24,
@@ -59,7 +61,10 @@ const Dashboard = () => {
                     title={'Review'}
                     values={1234} />
             </Space>
-        </div>
+            <Space>
+                <RecentOrders />
+            </Space>
+        </Space>
 
     );
 }
@@ -74,4 +79,43 @@ const DashBoardCard = ({ title, values, icon }) => {
     )
 }
 
+function RecentOrders() {
+    
+    const [dataSource,setDataSource]=useState([]);
+    const [loading,setLoading]=useState(false);
+
+    useEffect(()=>{
+        setLoading(true);
+        getOrders().then(res=>{
+            setDataSource(res.products.splice(0,3));
+            console.log(res.products)
+            setLoading(false);
+        });
+    },[]);
+
+    return<>
+    <Typography.Text>Recent Order</Typography.Text>
+     <Table
+        columns={[
+            {
+                title: 'Title',
+                dataIndex: "title"
+            },
+            {
+                title: 'Quntity',
+                dataIndex: "quntity"
+            },
+            {
+                title: 'Price',
+                dataIndex: "discountedPrice"
+            }
+        ]}
+        dataSource={dataSource}
+        loading={loading}
+        pagination={false}
+        >
+
+    </Table>
+    </>
+}
 export default Dashboard;
